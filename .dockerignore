@@ -2,10 +2,9 @@
 .idea
 .env
 
-# crawlee and apify storage folders
-apify_storage
-crawlee_storage
-storage
-
-# installed files
+# installed and built files
 node_modules
+dist
+
+# local working files
+.tmp

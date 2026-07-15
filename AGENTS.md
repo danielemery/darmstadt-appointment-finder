@@ -32,11 +32,11 @@ On each run it:
   before the notify/heartbeat code, so the run neither notifies falsely nor
   pings healthchecks — healthchecks.io going quiet is the intended breakage
   signal.
-- Local dev is modernised (Node 24, playwright 1.61.1 via the nix flake),
-  but the Docker image still builds on the Node 18 base (EOL April 2025)
-  whose preinstalled browsers no longer match the pinned playwright —
-  treat the container as broken until the runtime upgrade in `TASKS.md`
-  lands.
+- The toolchain is fully modernised (Node 24 + playwright 1.61.1 locally via
+  the nix flake; `mcr.microsoft.com/playwright:v1.61.1` in the container).
+  Constraint: the Docker base image tag, the `playwright` version in
+  `package.json`, and nixpkgs' `playwright-driver` must all stay on the same
+  version. The selector drift is the only remaining breakage.
 
 ## Layout
 
@@ -44,7 +44,7 @@ On each run it:
 |---|---|
 | `src/main.ts` | Entry point: launches Chromium, runs the check, notifies Gotify on success, pings healthchecks.io. |
 | `src/darmstadt.ts` | Drives the tevis booking flow and returns whether an appointment is available. |
-| `Dockerfile` | Two-stage build on `apify/actor-node-playwright-chrome:18`; runs `npm run start:prod` under xvfb. |
+| `Dockerfile` | Two-stage build on `mcr.microsoft.com/playwright:v1.61.1-noble`; final stage holds prod deps + `dist/` only. |
 | `.github/workflows/publish.yml` | On pushing a `v*.*.*` tag, builds and pushes the image to GHCR (`ghcr.io/<repo>`). |
 | `.env.example` | Template for the three required env vars. |
 
