@@ -118,8 +118,10 @@ tests. After changing `src/darmstadt.ts`, still do one live
 
 ## Release
 
-Tag a commit `vX.Y.Z` and push the tag; CI builds and publishes the Docker
-image to GHCR. Pushes to main and PRs run `npm run verify` in CI through the
+Cutting a release: bump `version` in `package.json` (sync the lockfile with
+`npm install --package-lock-only`) and the image tag in `deploy/cronjob.yaml`
+in the release-prep commit, then tag. Tag a commit `vX.Y.Z` and push the tag;
+CI builds and publishes the Docker image to GHCR. Pushes to main and PRs run `npm run verify` in CI through the
 flake devShell — the same toolchain as local dev, including the Playwright
 browsers for the HAR-replay test (the nix store is cached across runs). The
 publish workflow itself does not run verify, so don't tag an unverified
