@@ -77,6 +77,12 @@ Tag a commit `vX.Y.Z` and push the tag; CI builds and publishes the Docker
 image to GHCR. There is no CI on ordinary pushes or PRs — nothing runs build
 or typecheck before the tag, so verify locally before tagging.
 
+## Task tracking
+
+This project keeps a **long-living `TASKS.md`** — a persistent improvement
+backlog that survives across branches. Do not create or delete it per branch;
+append to it and move items between its sections as work progresses.
+
 ## Local artefacts
 
 Crawlee writes run state to `storage/` (gitignored) — request queues persist
