@@ -10,15 +10,17 @@ _(nothing)_
 
 ## Backlog
 
-- [ ] **Cut v0.1.0** once pushed and CI is green. The `deploy/` base pins
-  the v0.1.0 image tag, so the flux-cd deployment only works once that
-  release exists.
 - [ ] **Cut v1.0.0** once v0.1.0 has proven itself in production (cron
   running, heartbeats green, at least one real notification observed).
   Bump the image tag in `deploy/cronjob.yaml` as part of the release.
 
 ## Done
 
+- [x] 2026-07-15 — Cut v0.1.0: bumped package.json to 0.1.0 and refreshed
+  the 2023-vintage publish workflow (checkout v7, Docker actions SHA-pinned
+  to current releases) so the tag's image build doesn't die on deprecated
+  runtimes. Tag pushed by the operator; this unblocks the flux-cd
+  deployment, which pins the v0.1.0 image.
 - [x] 2026-07-15 — HAR-replay flow test: `scripts/record-har.mjs` records
   the live flow (via the real `checkAppointmentAvailable`) into
   `fixtures/darmstadt-flow.har` + metadata capturing availability at record
