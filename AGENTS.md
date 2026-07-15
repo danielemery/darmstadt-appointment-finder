@@ -17,7 +17,9 @@ On each run it:
    expand service category → increment the concern counter → continue →
    confirm dialog → location selection → continue).
 2. Looks for the text "Kein freier Termin verfügbar". If absent, an
-   appointment is assumed available and a **Gotify** notification is sent.
+   appointment is assumed available and a notification is sent through an
+   **Apprise API** server (delivery priority is encoded per target in the
+   Apprise URL, not in code).
 3. Always pings **healthchecks.io** (`https://hc-ping.com/<slug>`) as a
    heartbeat, whether or not an appointment was found.
 
@@ -46,6 +48,8 @@ On each run it:
 |---|---|
 | `src/main.ts` | Entry point: launches Chromium, runs the check, notifies Gotify on success, pings healthchecks.io. |
 | `src/darmstadt.ts` | Drives the tevis booking flow and returns whether an appointment is available. |
+| `src/notify.ts` | Sends notifications through an Apprise API server's stateless notify endpoint. |
+| `compose.yaml` | Dev-only: local Apprise server + HTTP echo sink for observing notifications. |
 | `Dockerfile` | Two-stage build on `mcr.microsoft.com/playwright:v1.61.1-noble`; final stage holds prod deps + `dist/` only. |
 | `.github/workflows/publish.yml` | On pushing a `v*.*.*` tag, builds and pushes the image to GHCR (`ghcr.io/<repo>`). |
 | `.env.example` | Template for the three required env vars. |
@@ -56,12 +60,13 @@ All config is via environment variables (loaded from `.env` via node's
 `--env-file-if-exists` in dev mode only; in the container they must be
 provided by the runtime):
 
-- `GOTIFY_URL` — base URL of the Gotify instance.
-- `GOTIFY_TOKEN` — Gotify app token.
+- `APPRISE_URL` — base URL of the Apprise API server.
+- `APPRISE_NOTIFY_URLS` — comma-separated Apprise URLs to notify (interim:
+  moves into the config file when that lands).
 - `HEALTHCHECKS_IO_SLUG` — healthchecks.io check slug for the heartbeat ping.
 
-None are validated at startup; missing values only surface when the fetch
-calls fire.
+The Apprise vars are checked when a notification is sent; the healthchecks
+slug is still unvalidated (a missing value only surfaces as a failed fetch).
 
 ## Local development
 

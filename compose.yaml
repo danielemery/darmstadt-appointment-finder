@@ -1,0 +1,14 @@
+# Local development only — the production Apprise server is deployed
+# separately. Brings up an Apprise API server and an HTTP echo sink so
+# delivered notifications can be observed:
+#
+#   docker compose up -d
+#   APPRISE_URL=http://localhost:8000 APPRISE_NOTIFY_URLS=json://echo:8080 npm run start:dev
+#   docker compose logs echo   # shows the delivered notification
+services:
+  apprise:
+    image: caronc/apprise:latest
+    ports:
+      - "8000:8000"
+  echo:
+    image: mendhak/http-https-echo:37

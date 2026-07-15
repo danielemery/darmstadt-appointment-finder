@@ -10,10 +10,9 @@ _(nothing)_
 
 ## Needed — rot and correctness
 
-- [ ] **Validate env vars at startup.** `GOTIFY_URL`, `GOTIFY_TOKEN`, and
-  `HEALTHCHECKS_IO_SLUG` are read but never checked; a missing value today
-  only surfaces as a failed fetch at the end of a run. Fail fast with a clear
-  message in `src/main.ts`.
+- [ ] **Validate env vars at startup.** Folds into the config-file item:
+  config validation covers the appointment/notification setup, and the
+  remaining env vars (`HEALTHCHECKS_IO_SLUG`) get checked alongside it.
 - [ ] **Signal failures to healthchecks.io explicitly.** Today any selector
   breakage means silence (missed heartbeat) — works, but slow to alarm and
   indistinguishable from the cron not firing. Catch handler errors and ping
@@ -33,17 +32,11 @@ _(nothing)_
   (path via env var, mounted into the container) declaring a list of watched
   appointment types. Each entry names the target service — office, service
   category, concern, today hardcoded German strings in `src/darmstadt.ts` — and
-  the list of notification URLs to fire when a slot appears. One run checks
-  every entry. Validate the config at startup and fail fast on errors.
+  the list of Apprise URLs to fire when a slot appears (dissolving the
+  interim `APPRISE_NOTIFY_URLS` env var). One run checks every entry.
+  Validate the config at startup and fail fast on errors — this also covers
+  the remaining unvalidated env vars (`HEALTHCHECKS_IO_SLUG`).
   Supersedes the hardcoded single-service flow.
-- [ ] **Notify via an Apprise server.** Replace the direct Gotify call with
-  POSTs to an Apprise API server, so any of Apprise's notification backends
-  can be used. The per-appointment notification URLs from the config file are
-  Apprise URLs (e.g. `gotify://…`), so the bespoke Gotify integration and its
-  env vars can be dropped. Depends on the config-file item.
-- [ ] **Richer notification.** Include the booking URL in the message so a
-  tap lands on the reservation page, and use a high priority so it bypasses
-  quiet hours — these appointments disappear fast.
 
 ## Done
 
@@ -54,6 +47,12 @@ _(nothing)_
   `@types/node` bumped to 24 to match; tsconfig fixed (`lib` was `["DOM"]`
   only) and `skipLibCheck` enabled for the Crawlee-3-vs-playwright-1.61
   type clash.
+- [x] 2026-07-15 — Notifications moved from bespoke Gotify to an Apprise API
+  server (`src/notify.ts`, interim `APPRISE_URL`/`APPRISE_NOTIFY_URLS` env
+  vars) with richer message (booking link; priority via Apprise URL params).
+  Failed delivery now fails the run (non-2xx throws). Dev `compose.yaml`
+  provides a local Apprise + echo sink; delivery and failure paths verified
+  against it.
 - [x] 2026-07-15 — Fixed selectors against the live site; first working run
   since 2023 (locally and in the container). Site changes handled: cookie
   banner is now an `Akzeptieren` button; "Weiter" lost its aria-label and

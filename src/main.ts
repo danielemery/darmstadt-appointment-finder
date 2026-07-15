@@ -1,10 +1,11 @@
 import { chromium } from "playwright";
 import { checkAppointmentAvailable } from "./darmstadt.js";
+import { sendNotification } from "./notify.js";
 
 const START_URL = "https://tevis.ekom21.de/stdar";
 
-const GOTIFY_TOKEN = process.env.GOTIFY_TOKEN;
-const GOTIFY_URL = process.env.GOTIFY_URL;
+const APPRISE_URL = process.env.APPRISE_URL;
+const APPRISE_NOTIFY_URLS = process.env.APPRISE_NOTIFY_URLS;
 const HEALTHCHECKS_IO_SLUG = process.env.HEALTHCHECKS_IO_SLUG;
 
 // Set HEADFUL=1 to watch the browser during local development.
@@ -19,15 +20,9 @@ try {
   try {
     if (available) {
       console.log("Appointment available");
-      await fetch(`${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: "Appointment available",
-          message: "A drivers license appointment is available",
-        }),
+      await sendNotification(APPRISE_URL, APPRISE_NOTIFY_URLS, {
+        title: "Appointment available",
+        body: `A drivers license appointment is available. Book now: ${START_URL}`,
       });
     } else {
       console.log("No appointment available");
