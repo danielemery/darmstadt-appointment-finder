@@ -42,8 +42,9 @@ from `CONFIG_PATH` (see `config.example.json`):
   passed to the container instead — for example from SOPS. Referencing an
   unset variable fails the run at startup.
 
-In the container, mount the config at `/app/config.json` (the default
-`CONFIG_PATH`).
+In the container, either mount the config at `/app/config.json` (the default
+`CONFIG_PATH`) or mount it elsewhere and point `CONFIG_PATH` at it (the k8s
+base mounts it at `/config/config.json`).
 
 ### Environment variables
 
@@ -55,6 +56,21 @@ In the container, mount the config at `/app/config.json` (the default
 | HEADFUL              | Optional. Set to any value to run the browser headful during local development    | 1                                    |
 
 Plus any variables referenced as `${VAR}` in the config file.
+
+## Deployment
+
+`deploy/` is a Kustomize base with a CronJob running the check every 10
+minutes (no retries, no overlap — failures alarm through healthchecks.io).
+It is designed to be consumed by a separate flux-cd repository that points
+at this public repo and supplies, in the target namespace:
+
+| Resource | Name | Contents |
+|---|---|---|
+| ConfigMap | `darmstadt-appointment-finder-config` | Key `config.json` with the config file (mounted at `/config/config.json`). |
+| Secret | `darmstadt-appointment-finder-env` | All env vars: `APPRISE_URL`, `HEALTHCHECKS_IO_SLUG`, and any `${VAR}` referenced in the config (e.g. from SOPS). |
+
+The base pins the image to a release tag; bump it via the flux overlay
+(kustomize `images:` transformer) or a new release here.
 
 ## Local testing
 

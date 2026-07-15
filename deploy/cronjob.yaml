@@ -1,0 +1,51 @@
+# Kustomize base consumed by a separate flux-cd repository, which supplies
+# the namespace plus two conventionally-named resources (see README):
+#   - ConfigMap darmstadt-appointment-finder-config with key config.json
+#   - Secret darmstadt-appointment-finder-env with all env vars
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: darmstadt-appointment-finder
+  labels:
+    app.kubernetes.io/name: darmstadt-appointment-finder
+spec:
+  schedule: "*/10 * * * *"
+  # No retries and no overlap: a failure already signals healthchecks.io
+  # explicitly, and the next tick is at most 10 minutes away.
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 300
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: darmstadt-appointment-finder
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: darmstadt-appointment-finder
+              image: ghcr.io/danielemery/darmstadt-appointment-finder:v0.1.0
+              env:
+                - name: CONFIG_PATH
+                  value: /config/config.json
+              envFrom:
+                - secretRef:
+                    name: darmstadt-appointment-finder-env
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 512Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: config
+              configMap:
+                name: darmstadt-appointment-finder-config

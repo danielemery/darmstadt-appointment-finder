@@ -10,9 +10,21 @@ _(nothing)_
 
 ## Backlog
 
-_(nothing — the 2026-07 modernisation is complete)_
+- [ ] **Cut v0.1.0** once pushed and CI is green. The `deploy/` base pins
+  the v0.1.0 image tag, so the flux-cd deployment only works once that
+  release exists.
+- [ ] **Cut v1.0.0** once v0.1.0 has proven itself in production (cron
+  running, heartbeats green, at least one real notification observed).
+  Bump the image tag in `deploy/cronjob.yaml` as part of the release.
 
 ## Done
+
+- [x] 2026-07-15 — Kustomize base in `deploy/`: CronJob every 10 minutes,
+  no retries/overlap, image pinned to v0.1.0, config mounted from ConfigMap
+  `darmstadt-appointment-finder-config` at `/config/config.json`, env from
+  Secret `darmstadt-appointment-finder-env` (contract documented in README;
+  a separate flux-cd repo supplies both plus the namespace). `kustomize
+  build` folded into `npm run verify` via flake-provided kustomize.
 
 - [x] 2026-07-15 — Failures now signal healthchecks.io explicitly: entry
   errors are collected (entries are checked independently) and the run pings

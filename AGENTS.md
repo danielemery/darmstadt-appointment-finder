@@ -63,6 +63,7 @@ immediately.
 | `Dockerfile` | Two-stage build on `mcr.microsoft.com/playwright:v1.61.1-noble`; final stage holds prod deps + `dist/` only. |
 | `.github/workflows/publish.yml` | On pushing a `v*.*.*` tag, builds and pushes the image to GHCR (`ghcr.io/<repo>`). |
 | `.github/workflows/verify.yml` | On push to main and PRs, runs `npm run verify` through the flake's `ci` devShell. |
+| `deploy/` | Kustomize base (CronJob, every 10 min) consumed by a separate flux-cd repo, which supplies namespace, config ConfigMap, and env Secret (names documented in README). |
 | `.env.example` | Template for the three required env vars. |
 
 ## Configuration
@@ -102,8 +103,8 @@ version in sync with nixpkgs' biome when bumping the flake input.
 - `npm run start:prod` — run the built `dist/main.js` (what the container runs).
 - `npm run lint` / `npm run lint:fix` — Biome check / auto-fix.
 
-**The canonical verification command is `npm run verify`** (build +
-lint). There are no tests; real verification of behaviour means running
+**The canonical verification command is `npm run verify`** (build + lint +
+kustomize render of `deploy/`). There are no tests; real verification of behaviour means running
 `npm run start:dev` against the live site and reading the log output
 ("No appointment available" / "Appointment available").
 

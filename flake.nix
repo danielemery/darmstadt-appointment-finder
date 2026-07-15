@@ -24,6 +24,8 @@
             # dynamically linked and cannot run on NixOS. Keep biome.json's
             # $schema version in sync with this package's version.
             pkgs.biome
+            # Validates the deploy/ manifests as part of `npm run verify`.
+            pkgs.kustomize
           ];
         in
         {
