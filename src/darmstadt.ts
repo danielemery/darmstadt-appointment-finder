@@ -6,8 +6,9 @@ import type { WatchedAppointment } from "./config.js";
  * whether a slot is available.
  *
  * Flow (as of 2026-07): accept cookies → pick office → expand service
- * category → increment the concern counter → Weiter → confirm dialog →
- * location selection → Weiter → appointment suggestions.
+ * category → increment the concern counter → Weiter → confirmation dialog
+ * (only for concerns with a "Hinweis" notice) → location selection →
+ * Weiter → appointment suggestions.
  */
 export async function checkAppointmentAvailable(
   page: Page,
@@ -40,9 +41,17 @@ export async function checkAppointmentAvailable(
   await nextButtonLocation.waitFor();
   await nextButtonLocation.click();
 
+  // Some concerns pop a confirmation dialog after Weiter; others navigate
+  // straight to the location step. Wait for whichever appears.
   const okButtonLocation = page.locator("button[id='OKButton']");
-  await okButtonLocation.waitFor();
-  await okButtonLocation.click();
+  const locationHeading = page.getByRole("heading", {
+    name: /Standortauswahl/,
+  });
+  await okButtonLocation.or(locationHeading).first().waitFor();
+  if (await okButtonLocation.isVisible()) {
+    await okButtonLocation.click();
+  }
+  await locationHeading.waitFor();
 
   // Location selection: a single location that the Weiter submit accepts
   // without an explicit choice.

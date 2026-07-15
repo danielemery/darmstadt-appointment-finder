@@ -16,6 +16,14 @@ _(nothing)_
 
 ## Done
 
+- [x] 2026-07-15 — Fixed prod bug (v0.1.1): the post-Weiter confirmation
+  dialog (`#OKButton`, the "Hinweis" modal) only appears for concerns with
+  notice text; concerns without it navigate straight to location selection,
+  so the hard wait timed out. The dialog is now raced against the step-3
+  heading and clicked only if present. Fixtures split per flow shape
+  (`confirmation-dialog` / `no-dialog`), both recorded live and replayed in
+  tests; `deploy/` bumped to v0.1.1.
+
 - [x] 2026-07-15 — Cut v0.1.0: bumped package.json to 0.1.0 and refreshed
   the 2023-vintage publish workflow (checkout v7, Docker actions SHA-pinned
   to current releases) so the tag's image build doesn't die on deprecated

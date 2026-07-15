@@ -18,7 +18,8 @@ For each configured appointment it:
 
 1. Drives the booking flow with Playwright (accept cookies → pick office →
    expand service category → increment the concern counter → continue →
-   confirm dialog → location selection → continue).
+   confirmation dialog, shown only for concerns with a "Hinweis" notice →
+   location selection → continue).
 2. Looks for the text "Kein freier Termin verfügbar". If absent, an
    appointment is assumed available and the entry's Apprise URLs are notified
    through an **Apprise API** server (delivery priority is encoded per target
