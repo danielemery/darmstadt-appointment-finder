@@ -14,7 +14,8 @@ periodically by an external cron — the app itself performs one check and exits
 On each run it:
 
 1. Drives the booking flow with Playwright (accept cookies → pick office →
-   expand service category → increment the request counter → continue → OK).
+   expand service category → increment the concern counter → continue →
+   confirm dialog → location selection → continue).
 2. Looks for the text "Kein freier Termin verfügbar". If absent, an
    appointment is assumed available and a **Gotify** notification is sent.
 3. Always pings **healthchecks.io** (`https://hc-ping.com/<slug>`) as a
@@ -22,12 +23,13 @@ On each run it:
 
 ## State of the repo (as of 2026-07)
 
-- Dormant 2023–2026, now being modernised; see `TASKS.md` for the backlog.
+- Dormant 2023–2026, modernised and working again as of 2026-07-15; see
+  `TASKS.md` for the remaining backlog.
 - **The scraper is selector-driven against a third-party site.** The German
   text selectors and aria-labels in `src/darmstadt.ts` are the fragile
-  surface. **Known broken as of 2026-07-15:** the site's cookie banner
-  changed since 2023 (now `Akzeptieren`/`Ablehnen` inputs without
-  aria-labels), so the flow fails at step one; later steps are unverified.
+  surface; the site drifted once already (2023→2026: new cookie banner, new
+  location-selection step, "Weiter" lost its aria-label). Verify against the
+  live site after any change to the flow.
 - The failure mode is inverted-alarm: any breakage in the booking flow throws
   before the notify/heartbeat code, so the run neither notifies falsely nor
   pings healthchecks — healthchecks.io going quiet is the intended breakage
@@ -36,7 +38,7 @@ On each run it:
   the nix flake; `mcr.microsoft.com/playwright:v1.61.1` in the container).
   Constraint: the Docker base image tag, the `playwright` version in
   `package.json`, and nixpkgs' `playwright-driver` must all stay on the same
-  version. The selector drift is the only remaining breakage.
+  version.
 
 ## Layout
 

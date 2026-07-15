@@ -10,14 +10,6 @@ _(nothing)_
 
 ## Needed — rot and correctness
 
-- [ ] **Fix selectors against the live site.** Confirmed broken 2026-07-15:
-  the cookie banner is now `Akzeptieren`/`Ablehnen` inputs without
-  aria-labels, so the flow dies at step one. The site itself is up and
-  recognizable (office buttons like "Fahrerlaubnisbehörde" still present;
-  there is also a dismissable info modal, "Hinweisfenster schließen", that
-  may need handling). Walk the flow headful (`HEADFUL=1 npm run start:dev`)
-  and fix each selector in `src/darmstadt.ts`; landing-page screenshot from
-  the check is at `.tmp/landing.png`.
 - [ ] **Validate env vars at startup.** `GOTIFY_URL`, `GOTIFY_TOKEN`, and
   `HEALTHCHECKS_IO_SLUG` are read but never checked; a missing value today
   only surfaces as a failed fetch at the end of a run. Fail fast with a clear
@@ -62,6 +54,12 @@ _(nothing)_
   `@types/node` bumped to 24 to match; tsconfig fixed (`lib` was `["DOM"]`
   only) and `skipLibCheck` enabled for the Crawlee-3-vs-playwright-1.61
   type clash.
+- [x] 2026-07-15 — Fixed selectors against the live site; first working run
+  since 2023 (locally and in the container). Site changes handled: cookie
+  banner is now an `Akzeptieren` button; "Weiter" lost its aria-label and
+  needs an exact role match (concern counters substring-match it via
+  "Erweiterung"); a new location-selection step sits between the concern
+  dialog and the appointment suggestions.
 - [x] 2026-07-15 — Container runtime moved to
   `mcr.microsoft.com/playwright:v1.61.1-noble` (tag must track the pinned
   playwright version). Final stage carries only prod deps + `dist/`, xvfb
