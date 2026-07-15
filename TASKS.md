@@ -8,21 +8,17 @@ sections as work progresses; add a date when completing.
 
 _(nothing)_
 
-## Needed — rot and correctness
+## Backlog
 
-- [ ] **Signal failures to healthchecks.io explicitly.** Today any selector
-  breakage means silence (missed heartbeat) — works, but slow to alarm and
-  indistinguishable from the cron not firing. Catch handler errors and ping
-  `https://hc-ping.com/<slug>/fail` so breakage alarms immediately.
-
-## Wanted — hygiene and tooling
-
-
-## Wanted — features
-
+_(nothing — the 2026-07 modernisation is complete)_
 
 ## Done
 
+- [x] 2026-07-15 — Failures now signal healthchecks.io explicitly: entry
+  errors are collected (entries are checked independently) and the run pings
+  `/fail` with the error details as the POST body, so breakage alarms
+  immediately instead of via a missed heartbeat. Success pings as before,
+  with a summary body.
 - [x] 2026-07-15 — Added `AGENTS.md` documenting current project state.
 - [x] 2026-07-15 — Added `.tmp/` to `.gitignore`.
 - [x] 2026-07-15 — Nix development flake: devShell with Node 24 and

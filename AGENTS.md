@@ -24,10 +24,12 @@ For each configured appointment it:
    through an **Apprise API** server (delivery priority is encoded per target
    in the Apprise URL, not in code).
 
-After all entries are checked it pings **healthchecks.io**
-(`https://hc-ping.com/<slug>`) as a heartbeat, whether or not appointments
-were found. A failed booking-flow check aborts the run without a heartbeat;
-a failed notification still heartbeats but exits non-zero.
+Entries are checked independently — a failure in one (broken flow or failed
+notification) doesn't stop the others. After all entries, the run signals
+**healthchecks.io**: a plain ping (`https://hc-ping.com/<slug>`) when
+everything succeeded, or the `/fail` endpoint with error details in the POST
+body when anything failed (plus a non-zero exit), so breakage alarms
+immediately.
 
 ## State of the repo (as of 2026-07)
 
@@ -38,10 +40,10 @@ a failed notification still heartbeats but exits non-zero.
   surface; the site drifted once already (2023→2026: new cookie banner, new
   location-selection step, "Weiter" lost its aria-label). Verify against the
   live site after any change to the flow.
-- The failure mode is inverted-alarm: any breakage in the booking flow throws
-  before the notify/heartbeat code, so the run neither notifies falsely nor
-  pings healthchecks — healthchecks.io going quiet is the intended breakage
-  signal.
+- Failures signal healthchecks.io explicitly via the `/fail` endpoint (with
+  error details in the body). The missed-heartbeat alarm remains the backstop
+  for the cases that can't ping: cron not firing, or startup failing before
+  config/env validation passes.
 - The toolchain is fully modernised (Node 24 + playwright 1.61.1 locally via
   the nix flake; `mcr.microsoft.com/playwright:v1.61.1` in the container).
   Constraint: the Docker base image tag, the `playwright` version in
