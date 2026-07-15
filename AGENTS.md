@@ -60,6 +60,7 @@ a failed notification still heartbeats but exits non-zero.
 | `compose.yaml` | Dev-only: local Apprise server + HTTP echo sink for observing notifications. |
 | `Dockerfile` | Two-stage build on `mcr.microsoft.com/playwright:v1.61.1-noble`; final stage holds prod deps + `dist/` only. |
 | `.github/workflows/publish.yml` | On pushing a `v*.*.*` tag, builds and pushes the image to GHCR (`ghcr.io/<repo>`). |
+| `.github/workflows/verify.yml` | On push to main and PRs, runs `npm run verify` through the flake's `ci` devShell. |
 | `.env.example` | Template for the three required env vars. |
 
 ## Configuration
@@ -107,8 +108,10 @@ lint). There are no tests; real verification of behaviour means running
 ## Release
 
 Tag a commit `vX.Y.Z` and push the tag; CI builds and publishes the Docker
-image to GHCR. There is no CI on ordinary pushes or PRs — nothing runs build
-or typecheck before the tag, so verify locally before tagging.
+image to GHCR. Pushes to main and PRs run `npm run verify` in CI (via the
+flake's `ci` devShell — same toolchain as local dev, minus the Playwright
+browsers, which verify doesn't need). The publish workflow itself does not
+run verify, so don't tag an unverified commit.
 
 ## Task tracking
 
