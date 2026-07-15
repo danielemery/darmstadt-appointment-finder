@@ -9,6 +9,6 @@
     "indentStyle": "space"
   },
   "files": {
-    "includes": ["**", "!.claude"]
+    "includes": ["**", "!.claude", "!fixtures/*.har"]
   }
 }

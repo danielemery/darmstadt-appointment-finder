@@ -40,13 +40,6 @@
             PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
             PLAYWRIGHT_DRIVER_VERSION = pkgs.playwright-driver.version;
           };
-
-          # Same toolchain without the Playwright browsers closure — CI's
-          # `npm run verify` (build + lint) never launches a browser, and the
-          # browsers add ~1 GB to the shell.
-          ci = pkgs.mkShell {
-            packages = tooling;
-          };
         }
       );
     };

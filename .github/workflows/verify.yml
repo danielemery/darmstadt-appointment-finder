@@ -17,8 +17,15 @@ jobs:
       - name: Install nix
         uses: DeterminateSystems/nix-installer-action@v22
 
+      # The default devShell includes the Playwright browsers (~1 GB closure)
+      # needed by the HAR-replay test; cache the nix store so runs stay fast.
+      - name: Cache nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock', 'flake.nix') }}
+
       - name: Install dependencies
-        run: nix develop .#ci --command npm ci
+        run: nix develop --command npm ci
 
       - name: Verify
-        run: nix develop .#ci --command npm run verify
+        run: nix develop --command npm run verify

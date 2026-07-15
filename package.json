@@ -19,6 +19,7 @@
     "lint:fix": "biome check --write .",
     "lint:manifests": "kustomize build deploy > /dev/null",
     "test": "npm run build && node --test 'dist/**/*.test.js'",
+    "fixtures:record": "npm run build && node scripts/record-har.mjs",
     "verify": "npm run lint && npm run lint:manifests && npm run test"
   },
   "author": "Daniel Emery <daniel@demery.net>",

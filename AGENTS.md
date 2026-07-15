@@ -62,8 +62,10 @@ immediately.
 | `compose.yaml` | Dev-only: local Apprise server + HTTP echo sink for observing notifications. |
 | `Dockerfile` | Two-stage build on `mcr.microsoft.com/playwright:v1.61.1-noble`; final stage holds prod deps + `dist/` only. |
 | `.github/workflows/publish.yml` | On pushing a `v*.*.*` tag, builds and pushes the image to GHCR (`ghcr.io/<repo>`). |
-| `.github/workflows/verify.yml` | On push to main and PRs, runs `npm run verify` through the flake's `ci` devShell. |
+| `.github/workflows/verify.yml` | On push to main and PRs, runs `npm run verify` through the flake devShell (nix store cached). |
 | `deploy/` | Kustomize base (CronJob, every 10 min) consumed by a separate flux-cd repo, which supplies namespace, config ConfigMap, and env Secret (names documented in README). |
+| `fixtures/` | Recorded HAR of the booking flow + metadata, replayed by `src/darmstadt.test.ts`; re-record via `npm run fixtures:record`. |
+| `scripts/record-har.mjs` | Records the live flow into `fixtures/` using the real `checkAppointmentAvailable`. |
 | `.env.example` | Template for the three required env vars. |
 
 ## Configuration
@@ -103,20 +105,24 @@ version in sync with nixpkgs' biome when bumping the flake input.
 - `npm run start:prod` — run the built `dist/main.js` (what the container runs).
 - `npm run lint` / `npm run lint:fix` — Biome check / auto-fix.
 - `npm run test` — build, then run the `node:test` suites (`src/*.test.ts`).
+- `npm run fixtures:record` — re-record `fixtures/darmstadt-flow.har` from
+  the live site (do this in the same PR as any selector fix).
 
 **The canonical verification command is `npm run verify`** (lint + kustomize
-render of `deploy/` + build + tests). The booking flow itself has no test
-coverage yet; verifying changes to `src/darmstadt.ts` means running
-`npm run start:dev` against the live site and reading the log output
-("No appointment available" / "Appointment available").
+render of `deploy/` + build + tests). The booking flow is regression-tested
+against a recorded HAR of the site — a failure there means our code broke,
+while live-site drift shows up via production's healthchecks alarm, not
+tests. After changing `src/darmstadt.ts`, still do one live
+`npm run start:dev` run, then re-record the fixture.
 
 ## Release
 
 Tag a commit `vX.Y.Z` and push the tag; CI builds and publishes the Docker
-image to GHCR. Pushes to main and PRs run `npm run verify` in CI (via the
-flake's `ci` devShell — same toolchain as local dev, minus the Playwright
-browsers, which verify doesn't need). The publish workflow itself does not
-run verify, so don't tag an unverified commit.
+image to GHCR. Pushes to main and PRs run `npm run verify` in CI through the
+flake devShell — the same toolchain as local dev, including the Playwright
+browsers for the HAR-replay test (the nix store is cached across runs). The
+publish workflow itself does not run verify, so don't tag an unverified
+commit.
 
 ## Task tracking
 

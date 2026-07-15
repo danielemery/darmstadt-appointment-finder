@@ -10,13 +10,6 @@ _(nothing)_
 
 ## Backlog
 
-- [ ] **HAR-replay flow test.** Record the live booking flow into a HAR
-  fixture (committed) and replay it in a test so `src/darmstadt.ts` gets
-  regression coverage against a pinned copy of the site — an unambiguous
-  "we broke it" signal, with production's healthchecks alarm covering "the
-  site changed". Re-record the fixture in the same PR as any selector fix.
-  Needs Playwright browsers in CI (`ci` devShell currently excludes them);
-  plan is a nix store cache action to keep that affordable.
 - [ ] **Cut v0.1.0** once pushed and CI is green. The `deploy/` base pins
   the v0.1.0 image tag, so the flux-cd deployment only works once that
   release exists.
@@ -26,6 +19,13 @@ _(nothing)_
 
 ## Done
 
+- [x] 2026-07-15 — HAR-replay flow test: `scripts/record-har.mjs` records
+  the live flow (via the real `checkAppointmentAvailable`) into
+  `fixtures/darmstadt-flow.har` + metadata capturing availability at record
+  time; `src/darmstadt.test.ts` replays it offline (~2s). Negative-tested:
+  a broken selector fails in 10s with a pointed error. CI switched to the
+  default devShell (browsers needed) with `cache-nix-action`; the separate
+  `ci` shell is gone.
 - [x] 2026-07-15 — Unit tests via `node:test` (zero new deps): config
   loading/validation/interpolation matrix and Apprise notify success/failure
   against a local HTTP stub. `npm run test` added and folded into
