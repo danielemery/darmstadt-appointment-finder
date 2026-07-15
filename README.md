@@ -2,7 +2,7 @@
 
 Docker container to run on a CRON to check the Darmstadt public office for appointments.
 
-Bootstrapped as a Crawlee + PlaywrightCrawler + TypeScript project.
+A Playwright + TypeScript project.
 
 ## Notes
 
@@ -19,3 +19,4 @@ All configuration is provided by environment variables.
 | GOTIFY_URL           | Url of the Gotify instance to be used when notifying of a completed appointment  | https://gotify.domain.net            |
 | GOTIFY_TOKEN         | Gotify app token used to authenticate when sending a notification                | skl4kmsdvl34                         |
 | HEALTHCHECKS_IO_SLUG | Slug from healthchecks.io, a heartbeat request is sent on completion of each run | e2654249-76b7-42d0-a292-3d5e993a4243 |
+| HEADFUL              | Optional. Set to any value to run the browser headful during local development   | 1                                    |

@@ -4,20 +4,17 @@
   "type": "module",
   "description": "Docker container to run on a CRON to check the Darmstadt public office for appointments.",
   "dependencies": {
-    "crawlee": "^3.0.0",
     "playwright": "1.61.1"
   },
   "devDependencies": {
     "@apify/tsconfig": "^0.1.0",
     "@types/node": "^24.0.0",
-    "dotenv": "^16.3.1",
-    "ts-node": "^10.8.0",
     "typescript": "^5.0.0"
   },
   "scripts": {
     "start": "npm run start:dev",
     "start:prod": "node dist/main.js",
-    "start:dev": "ts-node-esm -r dotenv/config -T src/main.ts",
+    "start:dev": "npm run build && node --env-file-if-exists=.env dist/main.js",
     "build": "tsc"
   },
   "author": "Daniel Emery <daniel@demery.net>",

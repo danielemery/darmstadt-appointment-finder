@@ -22,37 +22,37 @@ On each run it:
 
 ## State of the repo (as of 2026-07)
 
-- One commit, from June 2023. Nothing has been touched since; treat everything
-  below as potentially stale until verified against the live site.
-- **The scraper is selector-driven against a third-party site.** The tevis
-  booking UI may have changed since 2023 — German-language text selectors and
-  aria-labels in `src/routes.ts` are the fragile surface. Verify against the
-  real site before trusting a green run.
-- The failure mode is inverted-alarm: any breakage in the happy path before
-  the "Kein freier Termin" check throws inside the handler, so the run neither
-  notifies falsely nor pings healthchecks — healthchecks.io going quiet is the
-  intended breakage signal.
+- Dormant 2023–2026, now being modernised; see `TASKS.md` for the backlog.
+- **The scraper is selector-driven against a third-party site.** The German
+  text selectors and aria-labels in `src/darmstadt.ts` are the fragile
+  surface. **Known broken as of 2026-07-15:** the site's cookie banner
+  changed since 2023 (now `Akzeptieren`/`Ablehnen` inputs without
+  aria-labels), so the flow fails at step one; later steps are unverified.
+- The failure mode is inverted-alarm: any breakage in the booking flow throws
+  before the notify/heartbeat code, so the run neither notifies falsely nor
+  pings healthchecks — healthchecks.io going quiet is the intended breakage
+  signal.
 - Local dev is modernised (Node 24, playwright 1.61.1 via the nix flake),
   but the Docker image still builds on the Node 18 base (EOL April 2025)
   whose preinstalled browsers no longer match the pinned playwright —
   treat the container as broken until the runtime upgrade in `TASKS.md`
-  lands. Crawlee (3.4.0) and TypeScript (5.1.5) are still 2023 lockfile
-  resolutions.
+  lands. TypeScript (5.1.5) and `@apify/tsconfig` are 2023 leftovers.
 
 ## Layout
 
 | Path | Purpose |
 |---|---|
-| `src/main.ts` | Entry point: creates a `PlaywrightCrawler` with the router and runs it against the start URL. |
-| `src/routes.ts` | All real logic: the default handler drives the booking flow and does the notify/heartbeat. The `detail` handler is unused Crawlee-template boilerplate. |
+| `src/main.ts` | Entry point: launches Chromium, runs the check, notifies Gotify on success, pings healthchecks.io. |
+| `src/darmstadt.ts` | Drives the tevis booking flow and returns whether an appointment is available. |
 | `Dockerfile` | Two-stage build on `apify/actor-node-playwright-chrome:18`; runs `npm run start:prod` under xvfb. |
 | `.github/workflows/publish.yml` | On pushing a `v*.*.*` tag, builds and pushes the image to GHCR (`ghcr.io/<repo>`). |
 | `.env.example` | Template for the three required env vars. |
 
 ## Configuration
 
-All config is via environment variables (loaded from `.env` by dotenv in dev
-mode only; in the container they must be provided by the runtime):
+All config is via environment variables (loaded from `.env` via node's
+`--env-file-if-exists` in dev mode only; in the container they must be
+provided by the runtime):
 
 - `GOTIFY_URL` — base URL of the Gotify instance.
 - `GOTIFY_TOKEN` — Gotify app token.
@@ -73,9 +73,8 @@ re-pin `playwright` to match and regenerate the lockfile.
 
 ## Commands
 
-- `npm run start:dev` (also plain `npm start`) — run once locally via
-  `ts-node-esm` with `.env` loaded. Uncomment `headless: false` in
-  `src/main.ts` to watch the browser.
+- `npm run start:dev` (also plain `npm start`) — build, then run once locally
+  with `.env` loaded if present. Set `HEADFUL=1` to watch the browser.
 - `npm run build` — `tsc` to `dist/`.
 - `npm run start:prod` — run the built `dist/main.js` (what the container runs).
 
@@ -96,8 +95,3 @@ This project keeps a **long-living `TASKS.md`** — a persistent improvement
 backlog that survives across branches. Do not create or delete it per branch;
 append to it and move items between its sections as work progresses.
 
-## Local artefacts
-
-Crawlee writes run state to `storage/` (gitignored) — request queues persist
-between runs, so delete `storage/` if a local run appears to do nothing
-because the start URL is already marked handled.

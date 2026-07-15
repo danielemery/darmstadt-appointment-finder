@@ -1,12 +1,11 @@
-import { Dataset, createPlaywrightRouter } from "crawlee";
+import type { Page } from "playwright";
 
-export const router = createPlaywrightRouter();
-
-const GOTIFY_TOKEN = process.env.GOTIFY_TOKEN;
-const GOTIFY_URL = process.env.GOTIFY_URL;
-const HEALTHCHECKS_IO_SLUG = process.env.HEALTHCHECKS_IO_SLUG;
-
-router.addDefaultHandler(async ({ page, log }) => {
+/**
+ * Drives the tevis booking flow for an international driver's license
+ * exchange appointment ("Umschreibung einer ausländischen Fahrerlaubnis")
+ * and reports whether a slot is available.
+ */
+export async function checkAppointmentAvailable(page: Page): Promise<boolean> {
   const cookieLocation = page.locator(
     'input[aria-label="Cookie-Verwendung akzeptieren"]'
   );
@@ -38,30 +37,8 @@ router.addDefaultHandler(async ({ page, log }) => {
   const noAppointmentText = page.getByText("Kein freier Termin verfügbar");
   try {
     await noAppointmentText.waitFor({ timeout: 5000 });
-    log.info("No appointment available");
+    return false;
   } catch (err) {
-    log.info("Appointment available");
-    await fetch(`${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: "Appointment available",
-        message: "A drivers license appointment is available",
-      }),
-    });
-  } finally {
-    await fetch(`https://hc-ping.com/${HEALTHCHECKS_IO_SLUG}`);
+    return true;
   }
-});
-
-router.addHandler("detail", async ({ request, page, log }) => {
-  const title = await page.title();
-  log.info(`${title}`, { url: request.loadedUrl });
-
-  await Dataset.pushData({
-    url: request.loadedUrl,
-    title,
-  });
-});
+}
