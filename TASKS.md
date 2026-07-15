@@ -19,11 +19,13 @@ _(nothing)_
   and fix each selector in `src/darmstadt.ts`; landing-page screenshot from
   the check is at `.tmp/landing.png`.
 - [ ] **Upgrade the container runtime.** Base image
-  `apify/actor-node-playwright-chrome:18` is Node 18 (EOL April 2025). Move
-  to a current image. **Known-broken until then:** local dev is now Node 24 +
-  playwright 1.61.1 (pinned to nixpkgs), which mismatches the base image's
-  Node 18 and its preinstalled browsers — the Docker image should be assumed
-  non-functional until this lands (accepted 2026-07-15).
+  `apify/actor-node-playwright-chrome:18` is Node 18 (EOL April 2025).
+  Decided 2026-07-15: with Crawlee gone, move to
+  `mcr.microsoft.com/playwright` (official Playwright image), tag matching
+  the pinned playwright version (currently v1.61.1). **Known-broken until
+  then:** local dev is Node 24 + playwright 1.61.1, which mismatches the
+  base image's Node 18 and its preinstalled browsers — the Docker image
+  should be assumed non-functional until this lands (accepted 2026-07-15).
 - [ ] **Update remaining dependencies.** TypeScript is still 5.1.5 in the
   lockfile (2023 resolution), and `@apify/tsconfig` is a leftover from the
   Crawlee template — replace it with a small self-contained `tsconfig.json`
