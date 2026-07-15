@@ -102,9 +102,11 @@ version in sync with nixpkgs' biome when bumping the flake input.
 - `npm run build` — `tsc` to `dist/`.
 - `npm run start:prod` — run the built `dist/main.js` (what the container runs).
 - `npm run lint` / `npm run lint:fix` — Biome check / auto-fix.
+- `npm run test` — build, then run the `node:test` suites (`src/*.test.ts`).
 
-**The canonical verification command is `npm run verify`** (build + lint +
-kustomize render of `deploy/`). There are no tests; real verification of behaviour means running
+**The canonical verification command is `npm run verify`** (lint + kustomize
+render of `deploy/` + build + tests). The booking flow itself has no test
+coverage yet; verifying changes to `src/darmstadt.ts` means running
 `npm run start:dev` against the live site and reading the log output
 ("No appointment available" / "Appointment available").
 

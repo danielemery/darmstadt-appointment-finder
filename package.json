@@ -18,7 +18,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "lint:manifests": "kustomize build deploy > /dev/null",
-    "verify": "npm run build && npm run lint && npm run lint:manifests"
+    "test": "npm run build && node --test 'dist/**/*.test.js'",
+    "verify": "npm run lint && npm run lint:manifests && npm run test"
   },
   "author": "Daniel Emery <daniel@demery.net>",
   "license": "MIT"

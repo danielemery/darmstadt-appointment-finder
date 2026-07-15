@@ -10,6 +10,13 @@ _(nothing)_
 
 ## Backlog
 
+- [ ] **HAR-replay flow test.** Record the live booking flow into a HAR
+  fixture (committed) and replay it in a test so `src/darmstadt.ts` gets
+  regression coverage against a pinned copy of the site — an unambiguous
+  "we broke it" signal, with production's healthchecks alarm covering "the
+  site changed". Re-record the fixture in the same PR as any selector fix.
+  Needs Playwright browsers in CI (`ci` devShell currently excludes them);
+  plan is a nix store cache action to keep that affordable.
 - [ ] **Cut v0.1.0** once pushed and CI is green. The `deploy/` base pins
   the v0.1.0 image tag, so the flux-cd deployment only works once that
   release exists.
@@ -19,6 +26,10 @@ _(nothing)_
 
 ## Done
 
+- [x] 2026-07-15 — Unit tests via `node:test` (zero new deps): config
+  loading/validation/interpolation matrix and Apprise notify success/failure
+  against a local HTTP stub. `npm run test` added and folded into
+  `npm run verify`.
 - [x] 2026-07-15 — Kustomize base in `deploy/`: CronJob every 10 minutes,
   no retries/overlap, image pinned to v0.1.0, config mounted from ConfigMap
   `darmstadt-appointment-finder-config` at `/config/config.json`, env from

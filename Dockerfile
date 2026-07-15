@@ -11,6 +11,8 @@ RUN npm ci
 COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
+# Tests are compiled alongside the app; keep them out of the runtime image.
+RUN rm -f dist/*.test.js dist/*.test.js.map dist/*.test.d.ts
 
 # Final image: production dependencies and built output only.
 FROM mcr.microsoft.com/playwright:v1.61.1-noble
