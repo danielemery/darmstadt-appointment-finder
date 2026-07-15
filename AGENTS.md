@@ -32,9 +32,12 @@ On each run it:
   the "Kein freier Termin" check throws inside the handler, so the run neither
   notifies falsely nor pings healthchecks — healthchecks.io going quiet is the
   intended breakage signal.
-- Dependencies are old: Node 18 base image (EOL since April 2025),
-  `@types/node` 18, `playwright` pinned to `*` (whatever the base image
-  ships), Crawlee 3.x. Expect friction on a fresh `npm install`.
+- Local dev is modernised (Node 24, playwright 1.61.1 via the nix flake),
+  but the Docker image still builds on the Node 18 base (EOL April 2025)
+  whose preinstalled browsers no longer match the pinned playwright —
+  treat the container as broken until the runtime upgrade in `TASKS.md`
+  lands. Crawlee (3.4.0) and TypeScript (5.1.5) are still 2023 lockfile
+  resolutions.
 
 ## Layout
 
@@ -57,6 +60,16 @@ mode only; in the container they must be provided by the runtime):
 
 None are validated at startup; missing values only surface when the fetch
 calls fire.
+
+## Local development
+
+Local dev runs inside the nix devShell: `nix develop` (or `nix develop -c
+<cmd>` for one-offs). The shell provides Node 24 and Playwright browsers from
+nixpkgs via `PLAYWRIGHT_BROWSERS_PATH` — never run `npx playwright install`.
+Constraint: the `playwright` version in `package.json` must stay pinned to
+the exact version of nixpkgs' `playwright-driver` (echoed in the shell as
+`$PLAYWRIGHT_DRIVER_VERSION`); when bumping the flake's nixpkgs input,
+re-pin `playwright` to match and regenerate the lockfile.
 
 ## Commands
 

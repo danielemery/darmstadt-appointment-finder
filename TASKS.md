@@ -15,12 +15,15 @@ _(nothing)_
   manually; fix any selectors in `src/routes.ts` that have drifted since 2023.
   This gates everything else — no point modernising a scraper that no longer
   scrapes.
-- [ ] **Upgrade the runtime.** Base image `apify/actor-node-playwright-chrome:18`
-  is Node 18 (EOL April 2025). Move to a current LTS image, bump
-  `@types/node` to match.
-- [ ] **Pin and update dependencies.** `playwright` is `*` (takes whatever the
-  base image ships); pin it to the version matching the new base image.
-  Update Crawlee 3.x and TypeScript to current, regenerate lockfile.
+- [ ] **Upgrade the container runtime.** Base image
+  `apify/actor-node-playwright-chrome:18` is Node 18 (EOL April 2025). Move
+  to a current image. **Known-broken until then:** local dev is now Node 24 +
+  playwright 1.61.1 (pinned to nixpkgs), which mismatches the base image's
+  Node 18 and its preinstalled browsers — the Docker image should be assumed
+  non-functional until this lands (accepted 2026-07-15).
+- [ ] **Update remaining dependencies.** Crawlee is still at 3.4.0 and
+  TypeScript at 5.1.5 in the lockfile (2023 resolutions). Update after the
+  Crawlee-necessity evaluation decides what stays.
 - [ ] **Validate env vars at startup.** `GOTIFY_URL`, `GOTIFY_TOKEN`, and
   `HEALTHCHECKS_IO_SLUG` are read but never checked; a missing value today
   only surfaces as a failed fetch at the end of a run. Fail fast with a clear
@@ -32,12 +35,6 @@ _(nothing)_
 
 ## Wanted — hygiene and tooling
 
-- [ ] **Nix development flake.** Add a `flake.nix` with a devShell providing
-  Node, npm, and Playwright browser dependencies for local dev (operator's
-  primary machines run NixOS). Playwright on nix needs care: browsers should
-  come from nixpkgs (`playwright-driver.browsers` +
-  `PLAYWRIGHT_BROWSERS_PATH`), matched to the pinned playwright npm version,
-  rather than `npx playwright install`.
 - [ ] **Evaluate whether Crawlee is overkill.** The app visits one URL and
   drives a single deterministic flow — no crawling, no queue, no dataset
   (the only `Dataset` use is in dead boilerplate). Plain Playwright would
@@ -77,3 +74,8 @@ _(nothing)_
 
 - [x] 2026-07-15 — Added `AGENTS.md` documenting current project state.
 - [x] 2026-07-15 — Added `.tmp/` to `.gitignore`.
+- [x] 2026-07-15 — Nix development flake: devShell with Node 24 and
+  nixpkgs-provided Playwright browsers; playwright pinned to 1.61.1 and
+  `@types/node` bumped to 24 to match; tsconfig fixed (`lib` was `["DOM"]`
+  only) and `skipLibCheck` enabled for the Crawlee-3-vs-playwright-1.61
+  type clash.
