@@ -14,7 +14,10 @@
     "start": "npm run start:dev",
     "start:prod": "node dist/main.js",
     "start:dev": "npm run build && node --env-file-if-exists=.env dist/main.js",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "verify": "npm run build && npm run lint"
   },
   "author": "Daniel Emery <daniel@demery.net>",
   "license": "MIT"

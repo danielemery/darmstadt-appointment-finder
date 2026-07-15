@@ -11,7 +11,7 @@ export interface Notification {
 export async function sendNotification(
   appriseUrl: string,
   notifyUrls: string[],
-  notification: Notification
+  notification: Notification,
 ): Promise<void> {
   const response = await fetch(`${appriseUrl}/notify`, {
     method: "POST",
@@ -26,7 +26,7 @@ export async function sendNotification(
   });
   if (!response.ok) {
     throw new Error(
-      `Apprise notify failed: ${response.status} ${await response.text()}`
+      `Apprise notify failed: ${response.status} ${await response.text()}`,
     );
   }
 }

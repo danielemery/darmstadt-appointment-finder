@@ -18,10 +18,9 @@ _(nothing)_
 ## Wanted — hygiene and tooling
 
 - [ ] **CI on push/PR.** Nothing runs before a release tag today. Add a
-  workflow running the canonical verify (`npm run build`, plus lint once it
-  exists) on every push and PR.
-- [ ] **Add a linter.** No lint today; add ESLint (typescript-eslint) and fold
-  it into the canonical verify command.
+  workflow running the canonical verify (`npm run verify`) on every push and
+  PR — via `nix develop` so biome (flake-provided, not on npm) and the rest
+  of the toolchain match local dev.
 
 ## Wanted — features
 
@@ -35,6 +34,10 @@ _(nothing)_
   `@types/node` bumped to 24 to match; tsconfig fixed (`lib` was `["DOM"]`
   only) and `skipLibCheck` enabled for the Crawlee-3-vs-playwright-1.61
   type clash.
+- [x] 2026-07-15 — Added Biome (2.5.0 from the nix flake — the npm binary
+  can't run on NixOS; `biome.json` schema version tracks nixpkgs). New
+  canonical verify command: `npm run verify` (build + lint). Applied
+  formatting and lint fixes across the repo.
 - [x] 2026-07-15 — Config file for watched appointments (`src/config.ts`,
   `config.example.json`, `CONFIG_PATH` env var): per-entry office/category/
   concern + Apprise URLs, `${VAR}` env interpolation for secrets (SOPS →

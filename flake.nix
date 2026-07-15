@@ -19,6 +19,10 @@
         default = pkgs.mkShell {
           packages = [
             pkgs.nodejs_24
+            # Biome comes from nixpkgs, not npm: the npm-shipped binary is
+            # dynamically linked and cannot run on NixOS. Keep biome.json's
+            # $schema version in sync with this package's version.
+            pkgs.biome
           ];
 
           # Playwright browsers come from nixpkgs, not `npx playwright install`.

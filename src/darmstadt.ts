@@ -11,7 +11,7 @@ import type { WatchedAppointment } from "./config.js";
  */
 export async function checkAppointmentAvailable(
   page: Page,
-  appointment: Pick<WatchedAppointment, "office" | "category" | "concern">
+  appointment: Pick<WatchedAppointment, "office" | "category" | "concern">,
 ): Promise<boolean> {
   const cookieLocation = page.getByRole("button", { name: "Akzeptieren" });
   await cookieLocation.waitFor();
@@ -26,7 +26,7 @@ export async function checkAppointmentAvailable(
   await dropDownLocation.click();
 
   const plusButtonLocation = page.locator(
-    `button[aria-label='Erhöhen der Anzahl des Anliegens ${appointment.concern}']`
+    `button[aria-label='Erhöhen der Anzahl des Anliegens ${appointment.concern}']`,
   );
   await plusButtonLocation.waitFor();
   await plusButtonLocation.click();
@@ -57,7 +57,7 @@ export async function checkAppointmentAvailable(
   try {
     await noAppointmentText.waitFor({ timeout: 5000 });
     return false;
-  } catch (err) {
+  } catch {
     return true;
   }
 }

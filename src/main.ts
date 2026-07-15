@@ -1,6 +1,6 @@
 import { chromium } from "playwright";
-import { checkAppointmentAvailable } from "./darmstadt.js";
 import { loadConfig, requireEnv } from "./config.js";
+import { checkAppointmentAvailable } from "./darmstadt.js";
 import { sendNotification } from "./notify.js";
 
 const START_URL = "https://tevis.ekom21.de/stdar";

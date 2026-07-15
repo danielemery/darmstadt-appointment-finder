@@ -87,15 +87,20 @@ the exact version of nixpkgs' `playwright-driver` (echoed in the shell as
 `$PLAYWRIGHT_DRIVER_VERSION`); when bumping the flake's nixpkgs input,
 re-pin `playwright` to match and regenerate the lockfile.
 
+Biome also comes from the devShell, not npm — the npm-shipped binary is
+dynamically linked and cannot run on NixOS. Keep `biome.json`'s `$schema`
+version in sync with nixpkgs' biome when bumping the flake input.
+
 ## Commands
 
 - `npm run start:dev` (also plain `npm start`) — build, then run once locally
   with `.env` loaded if present. Set `HEADFUL=1` to watch the browser.
 - `npm run build` — `tsc` to `dist/`.
 - `npm run start:prod` — run the built `dist/main.js` (what the container runs).
+- `npm run lint` / `npm run lint:fix` — Biome check / auto-fix.
 
-There are no tests and no linter. **The canonical verification command is
-`npm run build`** (typecheck); real verification of behaviour means running
+**The canonical verification command is `npm run verify`** (build +
+lint). There are no tests; real verification of behaviour means running
 `npm run start:dev` against the live site and reading the log output
 ("No appointment available" / "Appointment available").
 

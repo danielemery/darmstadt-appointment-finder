@@ -38,7 +38,7 @@ function interpolate(value: string, location: string): string {
     const env = process.env[name];
     if (env === undefined) {
       throw new Error(
-        `${location} references environment variable ${name}, which is not set`
+        `${location} references environment variable ${name}, which is not set`,
       );
     }
     return env;
@@ -48,7 +48,7 @@ function interpolate(value: string, location: string): string {
 function requireString(
   value: unknown,
   location: string,
-  interpolated = false
+  interpolated = false,
 ): string {
   if (typeof value !== "string" || value.trim() === "") {
     throw new Error(`${location} must be a non-empty string`);
@@ -62,7 +62,7 @@ export async function loadConfig(configPath: string): Promise<Config> {
     raw = await readFile(configPath, "utf8");
   } catch (err) {
     throw new Error(
-      `Could not read config file at ${configPath}: ${(err as Error).message}`
+      `Could not read config file at ${configPath}: ${(err as Error).message}`,
     );
   }
 
@@ -71,7 +71,7 @@ export async function loadConfig(configPath: string): Promise<Config> {
     parsed = JSON.parse(raw);
   } catch (err) {
     throw new Error(
-      `Config file at ${configPath} is not valid JSON: ${(err as Error).message}`
+      `Config file at ${configPath} is not valid JSON: ${(err as Error).message}`,
     );
   }
 
@@ -94,7 +94,7 @@ export async function loadConfig(configPath: string): Promise<Config> {
         category: requireString(record.category, `${at}.category`),
         concern: requireString(record.concern, `${at}.concern`),
         notifyUrls: notifyUrls.map((url, j) =>
-          requireString(url, `${at}.notifyUrls[${j}]`, true)
+          requireString(url, `${at}.notifyUrls[${j}]`, true),
         ),
       };
     }),
