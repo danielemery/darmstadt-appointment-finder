@@ -10,9 +10,6 @@ _(nothing)_
 
 ## Needed — rot and correctness
 
-- [ ] **Validate env vars at startup.** Folds into the config-file item:
-  config validation covers the appointment/notification setup, and the
-  remaining env vars (`HEALTHCHECKS_IO_SLUG`) get checked alongside it.
 - [ ] **Signal failures to healthchecks.io explicitly.** Today any selector
   breakage means silence (missed heartbeat) — works, but slow to alarm and
   indistinguishable from the cron not firing. Catch handler errors and ping
@@ -28,15 +25,6 @@ _(nothing)_
 
 ## Wanted — features
 
-- [ ] **Config file for watched appointments.** Read a config file at startup
-  (path via env var, mounted into the container) declaring a list of watched
-  appointment types. Each entry names the target service — office, service
-  category, concern, today hardcoded German strings in `src/darmstadt.ts` — and
-  the list of Apprise URLs to fire when a slot appears (dissolving the
-  interim `APPRISE_NOTIFY_URLS` env var). One run checks every entry.
-  Validate the config at startup and fail fast on errors — this also covers
-  the remaining unvalidated env vars (`HEALTHCHECKS_IO_SLUG`).
-  Supersedes the hardcoded single-service flow.
 
 ## Done
 
@@ -47,6 +35,13 @@ _(nothing)_
   `@types/node` bumped to 24 to match; tsconfig fixed (`lib` was `["DOM"]`
   only) and `skipLibCheck` enabled for the Crawlee-3-vs-playwright-1.61
   type clash.
+- [x] 2026-07-15 — Config file for watched appointments (`src/config.ts`,
+  `config.example.json`, `CONFIG_PATH` env var): per-entry office/category/
+  concern + Apprise URLs, `${VAR}` env interpolation for secrets (SOPS →
+  container env), fail-fast validation of config and env vars at startup.
+  One run checks every entry in a fresh browser context. Dissolved
+  `APPRISE_NOTIFY_URLS`; verified locally and in the container with a
+  mounted config.
 - [x] 2026-07-15 — Notifications moved from bespoke Gotify to an Apprise API
   server (`src/notify.ts`, interim `APPRISE_URL`/`APPRISE_NOTIFY_URLS` env
   vars) with richer message (booking link; priority via Apprise URL params).

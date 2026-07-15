@@ -1,0 +1,13 @@
+{
+  "appointments": [
+    {
+      "name": "International driver's license exchange",
+      "office": "Fahrerlaubnisbehörde",
+      "category": "Erteilung/Ersatz/Umtausch",
+      "concern": "Antrag Umschreibung einer ausländischen Fahrerlaubnis",
+      "notifyUrls": [
+        "gotify://gotify.domain.net/${GOTIFY_APP_TOKEN}?priority=high"
+      ]
+    }
+  ]
+}

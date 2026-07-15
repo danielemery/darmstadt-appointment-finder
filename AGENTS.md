@@ -5,23 +5,29 @@ operator's global `AGENTS.md`; this file is project facts only.
 
 ## What this is
 
-A single-purpose web scraper that checks the Darmstadt public office booking
-site (`https://tevis.ekom21.de/stdar`) for **international driver's license
-exchange appointments** ("Umschreibung einer ausländischen Fahrerlaubnis" at
-the Fahrerlaubnisbehörde). It is packaged as a Docker image intended to be run
-periodically by an external cron — the app itself performs one check and exits.
+A web scraper that checks the Darmstadt public office booking site
+(`https://tevis.ekom21.de/stdar`) for appointment availability. The watched
+appointment types are declared in a JSON config file (see
+`config.example.json`); string values in it may reference env vars as
+`${VAR}` so secrets stay out of committed config (deployed via SOPS-provided
+container env). It is packaged as a Docker image intended to be run
+periodically by an external cron — the app checks every configured
+appointment once and exits.
 
-On each run it:
+For each configured appointment it:
 
 1. Drives the booking flow with Playwright (accept cookies → pick office →
    expand service category → increment the concern counter → continue →
    confirm dialog → location selection → continue).
 2. Looks for the text "Kein freier Termin verfügbar". If absent, an
-   appointment is assumed available and a notification is sent through an
-   **Apprise API** server (delivery priority is encoded per target in the
-   Apprise URL, not in code).
-3. Always pings **healthchecks.io** (`https://hc-ping.com/<slug>`) as a
-   heartbeat, whether or not an appointment was found.
+   appointment is assumed available and the entry's Apprise URLs are notified
+   through an **Apprise API** server (delivery priority is encoded per target
+   in the Apprise URL, not in code).
+
+After all entries are checked it pings **healthchecks.io**
+(`https://hc-ping.com/<slug>`) as a heartbeat, whether or not appointments
+were found. A failed booking-flow check aborts the run without a heartbeat;
+a failed notification still heartbeats but exits non-zero.
 
 ## State of the repo (as of 2026-07)
 
@@ -46,9 +52,11 @@ On each run it:
 
 | Path | Purpose |
 |---|---|
-| `src/main.ts` | Entry point: launches Chromium, runs the check, notifies Gotify on success, pings healthchecks.io. |
-| `src/darmstadt.ts` | Drives the tevis booking flow and returns whether an appointment is available. |
+| `src/main.ts` | Entry point: loads config, launches Chromium, checks each entry (fresh context per entry), notifies, heartbeats. |
+| `src/darmstadt.ts` | Drives the tevis booking flow for one appointment and returns whether a slot is available. |
 | `src/notify.ts` | Sends notifications through an Apprise API server's stateless notify endpoint. |
+| `src/config.ts` | Loads, env-interpolates, and validates the JSON config; also `requireEnv`. |
+| `config.example.json` | Example config; the real (gitignored) `config.json` is mounted into the container. |
 | `compose.yaml` | Dev-only: local Apprise server + HTTP echo sink for observing notifications. |
 | `Dockerfile` | Two-stage build on `mcr.microsoft.com/playwright:v1.61.1-noble`; final stage holds prod deps + `dist/` only. |
 | `.github/workflows/publish.yml` | On pushing a `v*.*.*` tag, builds and pushes the image to GHCR (`ghcr.io/<repo>`). |
@@ -61,12 +69,13 @@ All config is via environment variables (loaded from `.env` via node's
 provided by the runtime):
 
 - `APPRISE_URL` — base URL of the Apprise API server.
-- `APPRISE_NOTIFY_URLS` — comma-separated Apprise URLs to notify (interim:
-  moves into the config file when that lands).
 - `HEALTHCHECKS_IO_SLUG` — healthchecks.io check slug for the heartbeat ping.
+- `CONFIG_PATH` — optional, path to the config file (default `./config.json`;
+  the container mounts it at `/app/config.json`).
+- Any variables referenced as `${VAR}` inside the config file.
 
-The Apprise vars are checked when a notification is sent; the healthchecks
-slug is still unvalidated (a missing value only surfaces as a failed fetch).
+Env vars and config are validated at startup and fail fast, including
+references to unset variables.
 
 ## Local development
 

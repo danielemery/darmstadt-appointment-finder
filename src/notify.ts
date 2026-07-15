@@ -9,22 +9,17 @@ export interface Notification {
  * Apprise URL itself (e.g. gotify://host/token?priority=high).
  */
 export async function sendNotification(
-  appriseUrl: string | undefined,
-  notifyUrls: string | undefined,
+  appriseUrl: string,
+  notifyUrls: string[],
   notification: Notification
 ): Promise<void> {
-  if (!appriseUrl || !notifyUrls) {
-    throw new Error(
-      "APPRISE_URL and APPRISE_NOTIFY_URLS must be set to send notifications"
-    );
-  }
   const response = await fetch(`${appriseUrl}/notify`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      urls: notifyUrls,
+      urls: notifyUrls.join(","),
       title: notification.title,
       body: notification.body,
     }),

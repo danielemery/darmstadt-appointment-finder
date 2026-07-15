@@ -8,3 +8,4 @@ crawlee_storage
 storage
 .env
 .tmp
+config.json
