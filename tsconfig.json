@@ -1,14 +1,16 @@
 {
-    "extends": "@apify/tsconfig",
     "compilerOptions": {
-        "module": "ES2022",
-        "target": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "target": "ES2023",
+        "lib": ["ESNext"],
+        "types": ["node"],
         "outDir": "dist",
-        "noUnusedLocals": false,
+        "rootDir": "src",
+        "strict": true,
+        "esModuleInterop": true,
         "skipLibCheck": true,
-        "lib": ["ESNext", "DOM"]
+        "forceConsistentCasingInFileNames": true
     },
-    "include": [
-        "./src/**/*"
-    ]
+    "include": ["./src/**/*"]
 }

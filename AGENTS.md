@@ -36,7 +36,7 @@ On each run it:
   but the Docker image still builds on the Node 18 base (EOL April 2025)
   whose preinstalled browsers no longer match the pinned playwright —
   treat the container as broken until the runtime upgrade in `TASKS.md`
-  lands. TypeScript (5.1.5) and `@apify/tsconfig` are 2023 leftovers.
+  lands.
 
 ## Layout
 

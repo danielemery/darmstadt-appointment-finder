@@ -26,10 +26,6 @@ _(nothing)_
   then:** local dev is Node 24 + playwright 1.61.1, which mismatches the
   base image's Node 18 and its preinstalled browsers — the Docker image
   should be assumed non-functional until this lands (accepted 2026-07-15).
-- [ ] **Update remaining dependencies.** TypeScript is still 5.1.5 in the
-  lockfile (2023 resolution), and `@apify/tsconfig` is a leftover from the
-  Crawlee template — replace it with a small self-contained `tsconfig.json`
-  and update TypeScript to current.
 - [ ] **Validate env vars at startup.** `GOTIFY_URL`, `GOTIFY_TOKEN`, and
   `HEALTHCHECKS_IO_SLUG` are read but never checked; a missing value today
   only surfaces as a failed fetch at the end of a run. Fail fast with a clear
@@ -77,6 +73,9 @@ _(nothing)_
   `@types/node` bumped to 24 to match; tsconfig fixed (`lib` was `["DOM"]`
   only) and `skipLibCheck` enabled for the Crawlee-3-vs-playwright-1.61
   type clash.
+- [x] 2026-07-15 — Updated TypeScript to 7.0.2 and replaced `@apify/tsconfig`
+  with a self-contained `tsconfig.json` (NodeNext, strict; `types: ["node"]`
+  is required — TS 7 doesn't auto-include `@types/node` here).
 - [x] 2026-07-15 — Removed Crawlee (and with it the unused `detail` handler
   and the `storage/` state quirk): plain Playwright in `src/main.ts` +
   `src/darmstadt.ts`. Also dropped ts-node (broken on Node 24) and dotenv —
