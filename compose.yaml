@@ -11,4 +11,4 @@ services:
     ports:
       - "8000:8000"
   echo:
-    image: mendhak/http-https-echo:37
+    image: mendhak/http-https-echo:38
