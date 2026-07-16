@@ -27,18 +27,29 @@ for (const metaFile of metaFiles) {
     const browser = await chromium.launch();
     try {
       const context = await browser.newContext();
-      await context.routeFromHAR(
-        path.join(fixturesDir, `darmstadt-flow-${meta.key}.har`),
-        { notFound: "abort" },
-      );
-      const page = await context.newPage();
-      // Fail fast on selector regressions instead of the 30s default.
-      page.setDefaultTimeout(10_000);
+      try {
+        await context.routeFromHAR(
+          path.join(fixturesDir, `darmstadt-flow-${meta.key}.har`),
+          { notFound: "abort" },
+        );
+        const page = await context.newPage();
+        // Fail fast on selector regressions instead of the 30s default.
+        page.setDefaultTimeout(10_000);
 
-      await page.goto("https://tevis.ekom21.de/stdar");
-      const available = await checkAppointmentAvailable(page, meta.appointment);
+        await page.goto("https://tevis.ekom21.de/stdar");
+        const available = await checkAppointmentAvailable(
+          page,
+          meta.appointment,
+        );
 
-      assert.equal(available, meta.available);
+        assert.equal(available, meta.available);
+      } finally {
+        // The flow can complete while HAR routes are still serving late
+        // requests; closing mid-callback surfaces as an unhandledRejection
+        // after the test ends. Stop routing (and swallow the resulting
+        // in-flight errors) before teardown.
+        await context.unrouteAll({ behavior: "ignoreErrors" });
+      }
     } finally {
       await browser.close();
     }

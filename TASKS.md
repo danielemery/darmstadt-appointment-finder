@@ -10,17 +10,19 @@ _(nothing)_
 
 ## Backlog
 
-- [ ] **Flaky HAR-replay test** (seen 2026-07-16, ~1 in 3 locally): the
-  `confirmation-dialog` flow test occasionally fails with `"Target page,
-  context or browser has been closed" while running route callback` — a HAR
-  route still in flight at teardown. Likely fix per Playwright's own hint:
-  `await page.unrouteAll({ behavior: "ignoreErrors" })` before closing.
-
 - [ ] **Cut v1.0.0** once v0.1.0 has proven itself in production (cron
   running, heartbeats green, at least one real notification observed).
   Bump the image tag in `deploy/cronjob.yaml` as part of the release.
 
 ## Done
+
+- [x] 2026-07-16 — Fixed the flaky HAR-replay test (~1 in 3 locally): the
+  flow could complete while HAR routes were still serving late requests, so
+  teardown mid-callback surfaced as an unhandledRejection after the test
+  ended (`"Target page, context or browser has been closed" while running
+  route callback`). The test now runs `context.unrouteAll({ behavior:
+  "ignoreErrors" })` in a `finally` before closing. 10/10 repeated runs
+  clean.
 
 - [x] 2026-07-16 — Run duration in healthchecks.io: the run now sends a
   best-effort `/start` ping before the checks (a failure to reach
