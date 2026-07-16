@@ -25,7 +25,8 @@ _(nothing)_
 - [x] 2026-07-16 — Run duration in healthchecks.io: the run now sends a
   best-effort `/start` ping before the checks (a failure to reach
   hc-ping.com is logged, not fatal), so paired with the existing success or
-  /fail ping each run's duration shows in the check's event log.
+  /fail ping each run's duration shows in the check's event log. Released
+  as v0.2.0; `deploy/` bumped to match.
 
 - [x] 2026-07-15 — Fixed prod bug (v0.1.1): the post-Weiter confirmation
   dialog (`#OKButton`, the "Hinweis" modal) only appears for concerns with
