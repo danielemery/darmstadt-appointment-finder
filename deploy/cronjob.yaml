@@ -28,7 +28,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: darmstadt-appointment-finder
-              image: ghcr.io/danielemery/darmstadt-appointment-finder:v0.1.1
+              image: ghcr.io/danielemery/darmstadt-appointment-finder:v0.2.0
               env:
                 - name: CONFIG_PATH
                   value: /config/config.json

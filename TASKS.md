@@ -10,11 +10,23 @@ _(nothing)_
 
 ## Backlog
 
+- [ ] **Flaky HAR-replay test** (seen 2026-07-16, ~1 in 3 locally): the
+  `confirmation-dialog` flow test occasionally fails with `"Target page,
+  context or browser has been closed" while running route callback` — a HAR
+  route still in flight at teardown. Likely fix per Playwright's own hint:
+  `await page.unrouteAll({ behavior: "ignoreErrors" })` before closing.
+
 - [ ] **Cut v1.0.0** once v0.1.0 has proven itself in production (cron
   running, heartbeats green, at least one real notification observed).
   Bump the image tag in `deploy/cronjob.yaml` as part of the release.
 
 ## Done
+
+- [x] 2026-07-16 — Run duration in healthchecks.io: the run now sends a
+  best-effort `/start` ping before the checks (a failure to reach
+  hc-ping.com is logged, not fatal), so paired with the existing success or
+  /fail ping each run's duration shows in the check's event log. Released
+  as v0.2.0; `deploy/` bumped to match.
 
 - [x] 2026-07-15 — Fixed prod bug (v0.1.1): the post-Weiter confirmation
   dialog (`#OKButton`, the "Hinweis" modal) only appears for concerns with

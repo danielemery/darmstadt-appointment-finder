@@ -26,11 +26,12 @@ For each configured appointment it:
    in the Apprise URL, not in code).
 
 Entries are checked independently — a failure in one (broken flow or failed
-notification) doesn't stop the others. After all entries, the run signals
-**healthchecks.io**: a plain ping (`https://hc-ping.com/<slug>`) when
-everything succeeded, or the `/fail` endpoint with error details in the POST
-body when anything failed (plus a non-zero exit), so breakage alarms
-immediately.
+notification) doesn't stop the others. The run signals **healthchecks.io** at
+both ends: a best-effort `/start` ping before the checks (paired with the
+finishing ping, healthchecks records each run's duration), then after all
+entries a plain ping (`https://hc-ping.com/<slug>`) when everything
+succeeded, or the `/fail` endpoint with error details in the POST body when
+anything failed (plus a non-zero exit), so breakage alarms immediately.
 
 ## State of the repo (as of 2026-07)
 
