@@ -10,18 +10,29 @@ const HEALTHCHECKS_IO_SLUG = requireEnv("HEALTHCHECKS_IO_SLUG");
 const config = await loadConfig(process.env.CONFIG_PATH ?? "config.json");
 
 /**
- * Signals the run's outcome to healthchecks.io: a plain ping on success, the
- * /fail endpoint on failure so breakage alarms immediately instead of via a
- * missed heartbeat. The message shows up in the check's event log.
+ * Signals the run to healthchecks.io: /start when the run begins (paired
+ * with the finishing ping it lets healthchecks record each run's duration),
+ * a plain ping on success, the /fail endpoint on failure so breakage alarms
+ * immediately instead of via a missed heartbeat. The message shows up in the
+ * check's event log.
  */
-async function heartbeat(ok: boolean, message: string): Promise<void> {
-  await fetch(
-    `https://hc-ping.com/${HEALTHCHECKS_IO_SLUG}${ok ? "" : "/fail"}`,
-    {
-      method: "POST",
-      body: message,
-    },
-  );
+async function heartbeat(
+  signal: "start" | "success" | "fail",
+  message?: string,
+): Promise<void> {
+  const path = signal === "success" ? "" : `/${signal}`;
+  await fetch(`https://hc-ping.com/${HEALTHCHECKS_IO_SLUG}${path}`, {
+    method: "POST",
+    body: message,
+  });
+}
+
+// Best-effort: a hiccup reaching hc-ping.com must not abort the checks —
+// the run only loses its duration measurement for this cycle.
+try {
+  await heartbeat("start");
+} catch (err) {
+  console.error("healthchecks.io start ping failed:", err);
 }
 
 // Entries are checked independently: a broken flow for one appointment must
@@ -63,8 +74,11 @@ try {
 }
 
 if (failures.length > 0) {
-  await heartbeat(false, failures.join("\n"));
+  await heartbeat("fail", failures.join("\n"));
   process.exitCode = 1;
 } else {
-  await heartbeat(true, `Checked ${config.appointments.length} appointment(s)`);
+  await heartbeat(
+    "success",
+    `Checked ${config.appointments.length} appointment(s)`,
+  );
 }

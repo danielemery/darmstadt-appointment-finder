@@ -7,7 +7,7 @@ A Playwright + TypeScript project.
 ## Notes
 
 - Watches any number of Darmstadt appointment types, declared in a config file.
-- Signals every run to healthchecks.io: a heartbeat on success, the `/fail` endpoint (with error details) when any check or notification failed.
+- Signals every run to healthchecks.io: `/start` when the run begins (so healthchecks records run durations), a heartbeat on success, the `/fail` endpoint (with error details) when any check or notification failed.
 - Sends notifications through an [Apprise API](https://github.com/caronc/apprise-api) server when an appointment is found. Delivery priority is set per target in the Apprise URL (e.g. `gotify://host/token?priority=high`).
 
 ## Configuration
