@@ -1,7 +1,7 @@
 # Official Playwright image with browsers preinstalled. The tag must match
 # the playwright version pinned in package.json, or playwright will look for
 # browser builds that aren't in the image.
-FROM mcr.microsoft.com/playwright:v1.61.1-noble AS builder
+FROM mcr.microsoft.com/playwright:v1.63.0-noble AS builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN npm run build
 RUN rm -f dist/*.test.js dist/*.test.js.map dist/*.test.d.ts
 
 # Final image: production dependencies and built output only.
-FROM mcr.microsoft.com/playwright:v1.61.1-noble
+FROM mcr.microsoft.com/playwright:v1.63.0-noble
 
 WORKDIR /app
 
