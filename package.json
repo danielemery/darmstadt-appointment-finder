@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Docker container to run on a CRON to check the Darmstadt public office for appointments.",
   "dependencies": {
-    "playwright": "1.61.1"
+    "playwright": "1.63.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
